@@ -8,6 +8,6 @@ async def get_user_ids():
     try:
         users = await prisma.user.find_many()
         user_ids = [user.tgUserId for user in users]
-        return [1311888287]
+        return user_ids
     finally:
         await prisma.disconnect()

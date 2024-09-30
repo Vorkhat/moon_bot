@@ -1,0 +1,237 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://deploy:pagdaz-joxwe0-Pydtov@localhost:5432/tonmoon_farming_backend_db?schema=public"
+}
+
+model Boost {
+  id                  Int            @id @default(autoincrement())
+  kind                BoostKind
+  multiplier          Float          @default(2)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime
+  activationsCount    Int            @default(0)
+  activationsLeft     Int            @default(0)
+  clientName          Json?
+  tgChannelOrChatName Json?
+  url                 Json?
+  isBot               Boolean        @default(false)
+  priority            Int            @default(1)
+  isActive            Boolean        @default(true)
+  targetLanguages     String[]       @default([])
+  BoostFarming        BoostFarming[]
+
+  @@index([activationsLeft])
+  @@index([createdAt])
+  @@index([isActive])
+  @@index([priority])
+}
+
+model BoostFarming {
+  id         Int      @id @default(autoincrement())
+  endsAt     DateTime
+  farmingId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  boostId    Int
+  userId     Int
+  startedAt  DateTime
+  multiplier Float
+  Boost      Boost    @relation(fields: [boostId], references: [id], onDelete: Cascade)
+  Farming    Farming  @relation(fields: [farmingId], references: [id])
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([boostId, farmingId])
+  @@unique([userId, boostId])
+  @@index([boostId])
+  @@index([userId])
+}
+
+model Farming {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  pointsReward Float          @default(1)
+  startedAt    DateTime       @default(now())
+  endsAt       DateTime
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  isClaimed    Boolean        @default(false)
+  BoostFarming BoostFarming[]
+  User         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isClaimed, endsAt])
+  @@index([userId, isClaimed])
+}
+
+model Referral {
+  id                            Int      @id @default(autoincrement())
+  inviterId                     Int
+  invitedId                     Int      @unique
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime
+  User_Referral_invitedIdToUser User     @relation("Referral_invitedIdToUser", fields: [invitedId], references: [id], onDelete: Cascade)
+  User_Referral_inviterIdToUser User     @relation("Referral_inviterIdToUser", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([invitedId])
+  @@index([inviterId])
+  @@index([inviterId, invitedId])
+}
+
+model Reward {
+  id         Int          @id @default(autoincrement())
+  kind       RewardKind   @unique
+  points     Float?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  RewardUser RewardUser[]
+
+  @@index([kind])
+}
+
+model RewardUser {
+  id        Int      @id @default(autoincrement())
+  rewardId  Int
+  userId    Int
+  points    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Reward    Reward   @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, rewardId])
+}
+
+model Shuttle {
+  id                   Int           @id @default(autoincrement())
+  name                 Json
+  rewardDurationSec    Int
+  nftCollectionUrl     String        @unique
+  nftCollectionAddress String        @unique
+  imageUrl             String
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime
+  pointsReward         Float         @default(0)
+  kind                 ShuttleKind   @default(PARTNER)
+  priority             Int           @default(1)
+  UserShuttle          UserShuttle[]
+}
+
+model Task {
+  id                      Int        @id @default(autoincrement())
+  kind                    TaskKind
+  pointsReward            Float
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime
+  completionTimeoutSec    Int?
+  name                    Json?
+  description             Json?
+  url                     Json?
+  farmedPointsForReward   Int?
+  referralsCountForReward Int?
+  isActive                Boolean    @default(false)
+  tgChannelOrChatName     Json?
+  priority                Int        @default(1)
+  tonTransactionAmount    String?
+  UserTask                UserTask[]
+
+  @@index([createdAt])
+  @@index([isActive])
+  @@index([priority])
+}
+
+model User {
+  id                                Int            @id @default(autoincrement())
+  tgUserId                          BigInt         @unique
+  name                              String         @default("")
+  points                            Float          @default(0)
+  invitesLeft                       Int            @default(5)
+  acceptedInvitesCount              Int            @default(0)
+  createdAt                         DateTime       @default(now())
+  updatedAt                         DateTime
+  tgUserName                        String?
+  pointsFarmed                      Float          @default(0)
+  languageCode                      String         @default("en")
+  tonWalletAddress                  String?        @unique
+  BoostFarming                      BoostFarming[]
+  Farming                           Farming[]
+  Referral_Referral_invitedIdToUser Referral?      @relation("Referral_invitedIdToUser")
+  Referral_Referral_inviterIdToUser Referral[]     @relation("Referral_inviterIdToUser")
+  RewardUser                        RewardUser[]
+  UserShuttle                       UserShuttle[]
+  UserTask                          UserTask[]
+
+  @@index([acceptedInvitesCount])
+  @@index([name])
+  @@index([pointsFarmed])
+  @@index([points])
+  @@index([tgUserId])
+  @@index([tgUserName])
+}
+
+model UserShuttle {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  shuttleId          Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime
+  nftItemsOwnedCount Int      @default(0)
+  Shuttle            Shuttle  @relation(fields: [shuttleId], references: [id], onDelete: Cascade)
+  User               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, shuttleId])
+}
+
+model UserTask {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  taskId         Int
+  state          TaskState @default(STARTED)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+  tonTransaction Json?
+  Task           Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  User           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, taskId])
+  @@index([userId, taskId, state])
+}
+
+enum BoostKind {
+  NFT
+  AD_VIDEO
+  SPEED_UP_X2
+}
+
+enum RewardKind {
+  REFERRAL
+  REFERRAL_2ND_LEVEL
+  REFERRAL_TASK
+  FARMING
+}
+
+enum ShuttleKind {
+  MOON
+  PARTNER
+}
+
+enum TaskKind {
+  VISIT_LINK
+  SUBSCRIBE_TG_CHANNEL
+  SUBSCRIBE_TG_CHAT
+  BOOST_TG_CHANNEL
+  FARMING
+  INVITE_REFERRAL
+  PUBLISH_TG_STORY
+  TON_TRANSACTION
+}
+
+enum TaskState {
+  STARTED
+  COMPLETED
+  CLAIMED
+}

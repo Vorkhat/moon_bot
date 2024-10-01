@@ -10,6 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN PRISMA_PY_DEBUG_GENERATOR=1 python3 -m prisma generate
+RUN prisma db push
 
 CMD ["python", "main.py"]

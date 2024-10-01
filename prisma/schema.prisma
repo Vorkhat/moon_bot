@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://deploy:pagdaz-joxwe0-Pydtov@localhost:5432/tonmoon_farming_backend_db?schema=public"
+  url      = env("DATABASE_URL")
 }
 
 model Boost {

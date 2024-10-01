@@ -7,7 +7,7 @@ from config_reader import config
 from aiogram import Bot, Dispatcher, BaseMiddleware
 
 from routers.start import start, menu
-from routers.mailing import create_mailing, create_mailing_text, create_mailing_confirm
+from routers.mailing import create_mailing
 
 bot = Bot(token=config.bot_token.get_secret_value())
 
@@ -28,9 +28,7 @@ async def main():
     dp.message.middleware.register(AdminAccessMiddleware())
     dp.include_routers(
         start, menu,
-        create_mailing, create_mailing_text,
-        create_mailing_confirm
-                       )
+        create_mailing)
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

@@ -1,6 +1,5 @@
 from aiogram import Router, F, types
 from aiogram.filters import Command
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 start = Router()
 menu = Router()
@@ -10,7 +9,7 @@ async def start_router(message: types.Message):
     kb = [
         [types.KeyboardButton(text="Создать рассылку")],
     ]
-    keyboard = types.ReplyKeyboardMarkup(keyboard=kb)
+    keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     await message.answer("Выберите команду", reply_markup=keyboard)
 
 @menu.message(F.text.lower() == "menu")

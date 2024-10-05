@@ -5,18 +5,17 @@ packages = ["glibc", "nodejs", "python3"]
 [variables]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
-GLIBC_VERSION = "2.38"
 
 [build]
 nixpkgs_inputs = [
     "glibc",
     "glibcLocales",
     "gcc",
+    "glibc-2.38",
 ]
 
 [customizations.build]
 build_cmd = """
-    # Установка GLIBC и других зависимостей, необходимых для вашей среды
     apt-get update
     apt-get install -y gcc libc6-dev make wget
     wget http://ftp.gnu.org/gnu/libc/glibc-2.38.tar.gz

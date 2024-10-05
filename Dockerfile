@@ -11,5 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN prisma db push --accept-data-loss
+RUN prisma generate
 
 CMD ["python", "main.py"]

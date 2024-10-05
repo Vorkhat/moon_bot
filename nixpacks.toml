@@ -1,6 +1,5 @@
-[phases]
 [phases.setup]
-packages = ["glibc", "nodejs", "python3"]
+packages = ["glibc", "python3"]
 
 [variables]
 NODE_VERSION = "18"
@@ -12,6 +11,7 @@ nixpkgs_inputs = [
     "glibcLocales",
     "gcc",
     "glibc-2.38",
+    "nodejs-20_x",
 ]
 
 [customizations.build]
@@ -22,6 +22,5 @@ build_cmd = """
     tar -xvf glibc-2.38.tar.gz
     cd glibc-2.38 && mkdir build && cd build
     ../configure --prefix=/usr && make && make install
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-    apt-get install -y nodejs
+    npm install -g npx
   """

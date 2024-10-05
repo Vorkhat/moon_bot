@@ -2,7 +2,7 @@
 packages = ["glibc", "python3"]
 
 [variables]
-NODE_VERSION = "18"
+NODE_VERSION = "22"
 PYTHON_VERSION = "3.11"
 
 [build]
@@ -10,17 +10,17 @@ nixpkgs_inputs = [
     "glibc",
     "glibcLocales",
     "gcc",
-    "glibc-2.38",
-    "nodejs-20_x",
+    "nodejs-22_x"
 ]
 
 [customizations.build]
 build_cmd = """
     apt-get update
-    apt-get install -y gcc libc6-dev make wget curl
+    apt-get install -y gcc libc6-dev make wget
     wget http://ftp.gnu.org/gnu/libc/glibc-2.38.tar.gz
     tar -xvf glibc-2.38.tar.gz
     cd glibc-2.38 && mkdir build && cd build
     ../configure --prefix=/usr && make && make install
-    npm install -g npx
-  """
+    npm install -g prisma
+    npx prisma generate
+"""

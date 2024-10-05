@@ -1,11 +1,11 @@
 [phases]
-
 [phases.setup]
 packages = ["glibc", "nodejs", "python3"]
 
 [variables]
 NODE_VERSION = "18"
 PYTHON_VERSION = "3.11"
+GLIBC_VERSION = "2.38"
 
 [build]
 nixpkgs_inputs = [
@@ -13,9 +13,6 @@ nixpkgs_inputs = [
     "glibcLocales",
     "gcc",
 ]
-
-[variables]
-GLIBC_VERSION = "2.38"
 
 [customizations.build]
 build_cmd = """

@@ -1,5 +1,6 @@
 from prisma import Prisma
 
+
 async def get_user_ids():
     prisma = Prisma()
 

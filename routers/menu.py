@@ -4,6 +4,7 @@ from aiogram.filters import Command
 
 menu = Router()
 
+
 @menu.message(Command('admin'))
 async def admin_command(message: types.Message):
     kb = [
@@ -11,6 +12,7 @@ async def admin_command(message: types.Message):
     ]
     keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     await message.answer("Выберите команду", reply_markup=keyboard)
+
 
 @menu.message(Command('start'))
 async def start_command(message: types.Message):
@@ -33,6 +35,7 @@ async def start_command(message: types.Message):
     """)
 
     await message.answer(text, reply_markup=keyboard)
+
 
 @menu.message(F.text.casefold() == "menu")
 async def menu_command(message: types.Message):

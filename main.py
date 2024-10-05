@@ -3,13 +3,12 @@ from typing import Any, Dict, Callable, Awaitable
 
 from aiogram.types import Message
 
-from config_reader import config
-from aiogram import Bot, Dispatcher, BaseMiddleware
+from config_reader import config, bot
+from aiogram import Dispatcher, BaseMiddleware
 
 from routers.menu import menu
 from routers.mailing import create_mailing
 
-bot = Bot(token=config.bot_token.get_secret_value())
 
 class AdminAccessMiddleware(BaseMiddleware):
     async def __call__(
@@ -24,12 +23,13 @@ class AdminAccessMiddleware(BaseMiddleware):
         else:
             return ...
 
+
 async def main():
     dp = Dispatcher()
 
     dp.message.middleware.register(AdminAccessMiddleware())
     dp.include_routers(
-         menu,
+        menu,
         create_mailing)
 
     await bot.delete_webhook(drop_pending_updates=True)

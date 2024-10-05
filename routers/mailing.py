@@ -1,9 +1,11 @@
+import re
+
 from aiogram import Router, F, types
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from routers.start import menu_router
+from routers.menu import admin_command
 from utils.mailing import send_message_to_users
 
 create_mailing = Router()
@@ -40,16 +42,19 @@ async def handle_mailing_text(message: Message, state: FSMContext):
 
 @create_mailing.message(MailingStates.waiting_for_button_text)
 async def handle_button_text(message: Message, state: FSMContext):
-    await state.update_data(button_text=message.text)
 
     builder = InlineKeyboardBuilder()
     builder.button(text="Назад", callback_data="back_to_button_text")
 
-    await message.answer(
-        text="Теперь укажите ссылку для кнопки (например, URL):",
-        reply_markup=builder.as_markup()
-    )
-    await state.set_state(MailingStates.waiting_for_keyboard_link)
+    if re.match(r"^https://[a-zA-Z0-9-]+\.[a-zA-Z]{2,}([/\w .-]*)*/?$", message.text):
+        await state.update_data(button_text=message.text)
+        await message.answer(
+            text="Теперь укажите ссылку для кнопки (например, URL):",
+            reply_markup=builder.as_markup()
+        )
+        await state.set_state(MailingStates.waiting_for_keyboard_link)
+    else:
+        await message.answer(text="Ссылка указана неверно")
 
 @create_mailing.message(MailingStates.waiting_for_keyboard_link)
 async def handle_keyboard_link(message: Message, state: FSMContext):
@@ -121,4 +126,4 @@ async def handle_callbacks(callback: CallbackQuery, state: FSMContext):
 
     elif callback.data == "back_to_menu":
         await state.clear()
-        await menu_router(callback.message)
+        await admin_command(callback.message)

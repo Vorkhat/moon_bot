@@ -4,7 +4,7 @@ from aiogram import Bot
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config_reader import config
-from utils.db import get_user_ids
+from db import get_user_ids
 
 bot = Bot(token=config.bot_token.get_secret_value())
 

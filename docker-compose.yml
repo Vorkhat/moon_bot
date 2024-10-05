@@ -3,13 +3,14 @@ version: '3.8'
 services:
   bot:
     build: .
-    container_name: my_telegram_bot
+    container_name: telegram_bot
     restart: always
     volumes:
       - .:/app
     ports:
-      - "80:80"
+      - "8000:8000"
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - PYTHONUNBUFFERED=1
     env_file:
       - .env

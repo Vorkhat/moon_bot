@@ -25,6 +25,8 @@ model User {
 
   languageCode String @default("en")
 
+  access Boolean @default(true)
+
   // whom i invited
   referrals Referral[] @relation("inviter")
 

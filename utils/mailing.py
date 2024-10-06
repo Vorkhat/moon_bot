@@ -6,7 +6,7 @@ from config_reader import bot
 from utils.db import get_user_ids
 
 
-async def send_message_to_users(message_text: str, keyboard_text: str, keyboard_link: str, photo_id: int):
+async def send_message_to_users(message_text: str, keyboard_text: str, keyboard_link: str, photo_id: str = '0'):
     user_ids = await get_user_ids()
 
     for user_id in user_ids:

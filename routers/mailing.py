@@ -12,12 +12,14 @@ from utils.mailing import send_message_to_users
 
 create_mailing = Router()
 
+
 class MailingStates(StatesGroup):
     waiting_for_text = State()
     waiting_for_button_text = State()
     waiting_for_keyboard_link = State()
     waiting_for_image = State()
     confirm = State()
+
 
 @create_mailing.message(F.text.lower() == "создать рассылку")
 async def create_mailing_router(message: Message, state: FSMContext):
@@ -29,6 +31,7 @@ async def create_mailing_router(message: Message, state: FSMContext):
         reply_markup=builder.as_markup()
     )
     await state.set_state(MailingStates.waiting_for_text)
+
 
 @create_mailing.message(MailingStates.waiting_for_text)
 async def handle_mailing_text(message: Message, state: FSMContext):
@@ -43,6 +46,7 @@ async def handle_mailing_text(message: Message, state: FSMContext):
     )
     await state.set_state(MailingStates.waiting_for_button_text)
 
+
 @create_mailing.message(MailingStates.waiting_for_button_text)
 async def handle_button_text(message: Message, state: FSMContext):
     builder = InlineKeyboardBuilder()
@@ -55,9 +59,10 @@ async def handle_button_text(message: Message, state: FSMContext):
     )
     await state.set_state(MailingStates.waiting_for_keyboard_link)
 
+
 @create_mailing.message(MailingStates.waiting_for_keyboard_link)
 async def handle_keyboard_link(message: Message, state: FSMContext):
-    if re.match(r"^https://t\.me/[A-Za-z0-9_]+/app\?startapp$", message.text):
+    if re.match(r"^https://t\.me/[A-Za-z0-9_]+/[A-Za-z0-9_]+$", message.text):
         await state.update_data(keyboard_link=message.text)
 
         builder = InlineKeyboardBuilder()
@@ -71,6 +76,7 @@ async def handle_keyboard_link(message: Message, state: FSMContext):
         await state.set_state(MailingStates.waiting_for_image)
     else:
         await message.answer(text="Ссылка указана неверно")
+
 
 @create_mailing.message(MailingStates.waiting_for_image, F.photo)
 async def handle_image(message: Message, state: FSMContext):
@@ -103,6 +109,7 @@ async def handle_image(message: Message, state: FSMContext):
         reply_markup=keyboard
     )
     await state.set_state(MailingStates.confirm)
+
 
 @create_mailing.callback_query(F.data)
 async def handle_callbacks(callback: CallbackQuery, state: FSMContext):

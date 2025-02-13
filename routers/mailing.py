@@ -62,20 +62,17 @@ async def handle_button_text(message: Message, state: FSMContext):
 
 @create_mailing.message(MailingStates.waiting_for_keyboard_link)
 async def handle_keyboard_link(message: Message, state: FSMContext):
-    if re.match(r"^https://t\.me/[A-Za-z0-9_]+/[A-Za-z0-9_]+$", message.text):
-        await state.update_data(keyboard_link=message.text)
+    await state.update_data(keyboard_link=message.text)
 
-        builder = InlineKeyboardBuilder()
-        builder.button(text="Пропустить фото", callback_data="skip_photo")
-        builder.button(text="Назад", callback_data="back_to_button_text")
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Пропустить фото", callback_data="skip_photo")
+    builder.button(text="Назад", callback_data="back_to_button_text")
 
-        await message.answer(
-            text="Теперь отправьте изображение для рассылки:",
-            reply_markup=builder.as_markup()
-        )
-        await state.set_state(MailingStates.waiting_for_image)
-    else:
-        await message.answer(text="Ссылка указана неверно")
+    await message.answer(
+        text="Теперь отправьте изображение для рассылки:",
+        reply_markup=builder.as_markup()
+    )
+    await state.set_state(MailingStates.waiting_for_image)
 
 
 @create_mailing.message(MailingStates.waiting_for_image, F.photo)

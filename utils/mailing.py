@@ -1,4 +1,6 @@
 import asyncio
+import logging
+
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from prisma import Prisma
 from config_reader import bot
@@ -24,6 +26,7 @@ async def send_message(user_id, message_text, keyboard, photo_id, prisma, semaph
                 caption=message_text,
                 reply_markup=keyboard
             )
+            logging.info('Message sent to user %s', user_id)
         except Exception:
             await prisma.user.update(
                 where={"tgUserId": user_id},
@@ -50,4 +53,4 @@ async def send_message_to_users(message_text: str, keyboard_text: str, keyboard_
             await asyncio.gather(*tasks)
 
             offset += limit
-            await asyncio.sleep(1)  # Ограничение на уровень пакетов пользователей
+            await asyncio.sleep(1)

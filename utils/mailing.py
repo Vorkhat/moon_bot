@@ -21,9 +21,7 @@ async def send_message(user_id: int, message_text: str, builder, photo_id: str, 
             caption=message_text,
             reply_markup=builder.as_markup()
         )
-        print(f"Сообщение отправлено пользователю {user_id}")
     except Exception as error:
-        print(f"Ошибка при отправке пользователю {user_id}: {error}")
         await prisma.user.update(
             where={"tgUserId": user_id},
             data={"access": False}
